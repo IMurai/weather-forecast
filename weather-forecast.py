@@ -1,42 +1,68 @@
 import requests
 import time
 
-title = """
+# ASCII Art untuk title
+title = """ 
 ██╗    ██╗███████╗ █████╗ ████████╗██╗  ██╗███████╗██████╗     ███████╗ ██████╗ ██████╗ ███████╗ ██████╗ █████╗ ███████╗████████╗
 ██║    ██║██╔════╝██╔══██╗╚══██╔══╝██║  ██║██╔════╝██╔══██╗    ██╔════╝██╔═══██╗██╔══██╗██╔════╝██╔════╝██╔══██╗██╔════╝╚══██╔══╝
 ██║ █╗ ██║█████╗  ███████║   ██║   ███████║█████╗  ██████╔╝    █████╗  ██║   ██║██████╔╝█████╗  ██║     ███████║███████╗   ██║   
 ██║███╗██║██╔══╝  ██╔══██║   ██║   ██╔══██║██╔══╝  ██╔══██╗    ██╔══╝  ██║   ██║██╔══██╗██╔══╝  ██║     ██╔══██║╚════██║   ██║   
 ╚███╔███╔╝███████╗██║  ██║   ██║   ██║  ██║███████╗██║  ██║    ██║     ╚██████╔╝██║  ██║███████╗╚██████╗██║  ██║███████║   ██║   
  ╚══╝╚══╝ ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝    ╚═╝      ╚═════╝ ╚═╝  ╚═╝╚══════╝ ╚═════╝╚═╝  ╚═╝╚══════╝   ╚═╝   
-"""
+""" 
 
-city = input("Masukkan nama kota: ")
+# Function untuk mencari data kota
+def find_city(city):
+    print(f"Mencari data untuk kota {city}....\n")
+    time.sleep(0.5)
 
-print(f"Mencari data untuk kota {city}....\n")
-time.sleep(0.5)
+    city_response = requests.get(f"https://geocoding-api.open-meteo.com/v1/search?name={city}&count=1&language=en&format=json") # Mengambil dan menyimpan data kota dari API
+    city_data = city_response.json() # Mengubah format data menjadi dict python
 
-city_response = requests.get(f"https://geocoding-api.open-meteo.com/v1/search?name={city}&count=1&language=en&format=json")
-city_data = city_response.json()
+    data = { # Mengekstrak data kota dan ditampung di dalam dict 
+        "city_name" : city_data['results'][0]['name'], # Nama kota
+        "city_province" : city_data['results'][0]['admin1'], # Provinsi
+        "city_latitude" : city_data['results'][0]['latitude'], # Koordinat garis lintang
+        "city_longitude" : city_data['results'][0]['longitude'], # Koordinat garis bujur
+    }
 
-city_name = city_data['results'][0]['name']
-city_province = city_data['results'][0]['admin1']
+    print(f"[Ditemukan]: {data["city_name"]}, {data["city_province"]}")
 
-print(f"[Ditemukan]: {city_name}, {city_province}")
-print("Mencari data cuaca terbaru...\n")
-time.sleep(0.5)
+    return data # Mengembalikan dict data
 
-city_latitude = city_data['results'][0]['latitude']
-city_longitude = city_data['results'][0]['longitude']
+# Function untuk mencari data perkiraan cuaca
+def get_forecast(city_latitude, city_longitude):
+    print("Mencari data cuaca terbaru...\n")
+    time.sleep(0.5)
 
-weather_response = requests.get(f"https://api.open-meteo.com/v1/forecast?latitude={city_latitude}&longitude={city_longitude}&current=temperature_2m,weather_code,wind_speed_10m")
-weather_data = weather_response.json()
+    weather_response = requests.get(f"https://api.open-meteo.com/v1/forecast?latitude={city_latitude}&longitude={city_longitude}&current=temperature_2m,weather_code,wind_speed_10m") # Mengambil dan menyimpan data perkiraan cuaca dari API
 
-date = weather_data["current"]["time"][:10]
-weather = weather_data["current"]["weather_code"]
-temperature = weather_data["current"]["temperature_2m"]
-wind_speed = weather_data["current"]["wind_speed_10m"]
+    return weather_response.json() # Mengembalikan data perkiraan cuaca dalam bentuk dict
 
-print(f"{city_name}, {city_province} {date}")
-print(weather)
-print(f"{temperature} °C")
-print(f"{wind_speed} km/h")
+# Function untuk mengambil data perkiraan cuaca
+def get_weather_data(city):
+    weather_data = get_forecast(
+            city_info["city_latitude"],
+            city_info["city_longitude"]
+        ) # Mengambil nilai lintang bujur kota dengan function get_forecast
+    
+    data = { # Mengekstrak data perkiraan cuaca dan ditampung di dalam dict
+        "date" : weather_data["current"]["time"][:10], # Hari perkiraan cuaca
+        "weather" : weather_data["current"]["weather_code"], # Perkiraan cuaca dikota
+        "temperature" : weather_data["current"]["temperature_2m"], # Temperature di kota
+        "wind_speed" : weather_data["current"]["wind_speed_10m"] # Kecepatan angin dikota
+    } 
+
+    return data # Mengembalikan dict data
+
+print(title)
+city = input("Masukkan nama kota: ") # Input nama kota
+
+city_info = find_city(city) 
+
+city_weather = get_weather_data(city) # Mengambil data perkiraan cuaca yang sudah disiapkan
+
+print(f"{city_weather["date"]}")
+print(f"{city_weather["weather"]}")
+print(f"{city_weather["temperature"]} °C")
+print(f"{city_weather["wind_speed"]} km/h")
