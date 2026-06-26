@@ -1,7 +1,7 @@
 import requests
 import time
 
-# =================================================
+# =================================================Z
 # ASCII Art untuk title
 # =================================================
 title = """ 
@@ -14,16 +14,17 @@ title = """
 """ 
 
 # =================================================
-# Function untuk mencari data kota
+"Function untuk mencari data kota"
 # =================================================
 def find_city(city):
     print(f"Mencari data untuk kota '{city}'....\n")
     time.sleep(0.5)
 
     city_response = requests.get(
-        f"https://geocoding-api.open-meteo.com/v1/search?"
-        f"name={city}&count=1&language=en&format=json"
-        ) # Mengambil dan menyimpan data kota dari API
+        f"https://geocoding-api.open-meteo.com/v1/search?name={city}" # Mengirim request ke API dengan nama kota sebagai query 
+        f"&count=1&language=en" # Mengambil 1 data teratas
+        f"&format=json" # Response dalam format json
+        ) 
     
     city_data = city_response.json() # Mengubah format data menjadi dict python
 
@@ -36,10 +37,10 @@ def find_city(city):
 
     print(f"[Ditemukan]: {data["name"]}, {data["country"]}")
 
-    return data # Mengembalikan dict data
+    return data # Mengembalikan data kota
 
 # =================================================
-# Function untuk mencari data perkiraan cuaca
+"Function untuk mencari data perkiraan cuaca"
 # =================================================
 def get_forecast(latitude, longitude):
     print("Mengambil data cuaca terbaru...\n")
@@ -51,7 +52,7 @@ def get_forecast(latitude, longitude):
         f"&current=temperature_2m,weather_code,wind_speed_10m"
         ) # Mengambil dan menyimpan data perkiraan cuaca dari API
 
-    return weather_response.json() # Mengembalikan data perkiraan cuaca dalam bentuk dict
+    return weather_response.json() # Mengembalikan data response(data mentah) dalam bentuk dict
 
 # =================================================
 # Function untuk mengambil data perkiraan cuaca
@@ -69,35 +70,35 @@ def get_weather_data():
         "wind_speed"   : weather_data["current"]["wind_speed_10m"]  # Kecepatan angin (km/h)
     } 
 
-    return data # Mengembalikan dict data
+    return data # Mengembalikan data perkiraan cuaca
 
 # =================================================
-    "PROGRAM UTAMA"
+"PROGRAM UTAMA"
 # =================================================
-session = 0
+session = 0 # Melacak jumlah pencarian yang sudah dilakukan
 
-print(title)
+print(title) # Menampilkan judul program
 
-while True:
-    if session == 0:
-        quit_massage = ""
-    else:
+while True: # Looping utama: berjalan sampai user memilih 'quit'
+    quit_massage = ""
+
+    if session > 0: # Tampilkan opsi keluar hanya jika user sudah pernah melakukan pencarian
         quit_massage = "(Ketik 'quit' untuk berhenti)"
 
     city = input(f"\nMasukkan nama kota{quit_massage}: ") # Input nama kota
 
-    if city == "quit":
+    if city == "quit": # Menghentikan loop saat user memilih quit
         break
 
-    city_info = find_city(city) 
+    city_info = find_city(city) # Mencari data kota berdasarkan input
+    city_weather = get_weather_data() # Mengambil data perkiraan cuaca 
 
-    city_weather = get_weather_data() # Mengambil data perkiraan cuaca yang sudah disiapkan
+    print(f"{city_info["name"]}, {city_info["country"]}\n") # Menampilkan nama kota dan negara
 
-    print(f"{city_info["name"]}, {city_info["country"]}\n")
-
+    # Menampilkan detail informasi cuaca secara terformat
     print(f"- Waktu pantau    : {city_weather["date"]} {city_weather["time"]}")
     print(f"- Kondisi cuaca   : {city_weather["weather"]}")
     print(f"- Suhu            : {city_weather["temperature"]} °C")
     print(f"- Kecepatan angin : {city_weather["wind_speed"]} km/h")
 
-    session += 1
+    session += 1 # Menambahkan jumlah sesi
