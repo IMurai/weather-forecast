@@ -40,7 +40,7 @@ def find_city(city):
     return data # Mengembalikan data kota
 
 # "Function untuk mencari data perkiraan cuaca"
-def get_forecast(latitude, longitude):
+def get_location(latitude, longitude):
     print("Mengambil data cuaca terbaru...\n")
     time.sleep(0.5)
 
@@ -53,16 +53,15 @@ def get_forecast(latitude, longitude):
     return api_response.json() # Mengembalikan data response(data mentah) dalam bentuk dict
 
 # Function untuk mengambil data perkiraan cuaca
-def get_weather_data():
-    weather_data = get_forecast(
+def get_data():
+    weather_data = get_location(
             city_info["latitude"],
             city_info["longitude"]
-        ) # Mengambil nilai lintang bujur kota dengan function get_forecast
+        ) # Mengambil nilai lintang bujur kota dengan function get_location
     
     data = { # Mengekstrak data perkiraan cuaca dan ditampung di dalam dict
         "date" : weather_data["current"]["time"][:10], # Tanggal pemantauan cuaca (YYYY-MM-DD)
-        "time" : weather_data["current"]["time"][11:],
-        "weather" : weather_data["current"]["weather_code"], # kode cuaca
+        "time" : weather_data["current"]["time"][11:], # Jam pemantauan cuaca
         "temperature" : weather_data["current"]["temperature_2m"], # Suhu (°C)
         "wind_speed" : weather_data["current"]["wind_speed_10m"] # Kecepatan angin (km/h)
     } 
@@ -86,7 +85,7 @@ while True: # Looping utama: berjalan sampai user memilih 'quit'
         break
 
     city_info = find_city(city) # Mencari data kota berdasarkan input
-    city_weather = get_weather_data() # Mengambil data perkiraan cuaca 
+    city_weather = get_data() # Mengambil data perkiraan cuaca 
 
     print(f"{city_info["name"]}, {city_info["country"]}\n") # Menampilkan nama kota dan negara
 
