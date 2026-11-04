@@ -13,9 +13,8 @@ title = """
  ╚══╝╚══╝ ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝    ╚═╝      ╚═════╝ ╚═╝  ╚═╝╚══════╝ ╚═════╝╚═╝  ╚═╝╚══════╝   ╚═╝   
 """ 
 
-# =================================================
-"Function untuk mencari data kota"
-# =================================================
+# "Function untuk mencari data kota"
+
 def find_city(city):
     print(f"Mencari data untuk kota '{city}'....\n")
     time.sleep(0.5)
@@ -39,9 +38,7 @@ def find_city(city):
 
     return data # Mengembalikan data kota
 
-# =================================================
-"Function untuk mencari data perkiraan cuaca"
-# =================================================
+# "Function untuk mencari data perkiraan cuaca"
 def get_forecast(latitude, longitude):
     print("Mengambil data cuaca terbaru...\n")
     time.sleep(0.5)
@@ -54,9 +51,7 @@ def get_forecast(latitude, longitude):
 
     return weather_response.json() # Mengembalikan data response(data mentah) dalam bentuk dict
 
-# =================================================
 # Function untuk mengambil data perkiraan cuaca
-# =================================================
 def get_weather_data():
     weather_data = get_forecast(
             city_info["latitude"],
@@ -64,17 +59,16 @@ def get_weather_data():
         ) # Mengambil nilai lintang bujur kota dengan function get_forecast
     
     data = { # Mengekstrak data perkiraan cuaca dan ditampung di dalam dict
-        "date"         : weather_data["current"]["time"][:10],      # Tanggal pemantauan cuaca (YYYY-MM-DD)
-        "time"         : weather_data["current"]["time"][11:],      # Waktu pemantauan cuaca
-        "temperature"  : weather_data["current"]["temperature_2m"], # Suhu (°C)
-        "wind_speed"   : weather_data["current"]["wind_speed_10m"]  # Kecepatan angin (km/h)
+        "date" : weather_data["current"]["time"][:10], # Tanggal pemantauan cuaca (YYYY-MM-DD)
+        "time" : weather_data["current"]["time"][11:],
+        "weather" : weather_data["current"]["weather_code"], # kode cuaca
+        "temperature" : weather_data["current"]["temperature_2m"], # Suhu (°C)
+        "wind_speed" : weather_data["current"]["wind_speed_10m"] # Kecepatan angin (km/h)
     } 
 
     return data # Mengembalikan data perkiraan cuaca
 
-# =================================================
-"PROGRAM UTAMA"
-# =================================================
+# "PROGRAM UTAMA"
 session = 0 # Melacak jumlah pencarian yang sudah dilakukan
 
 print(title) # Menampilkan judul program
