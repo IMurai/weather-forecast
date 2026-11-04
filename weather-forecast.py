@@ -51,12 +51,7 @@ def get_location(latitude, longitude):
     return api_response.json() # Mengembalikan data response(data mentah) dalam bentuk dict
 
 # Function untuk mengambil data perkiraan cuaca
-def get_data():
-    weather_data = get_location(
-            city_info["latitude"],
-            city_info["longitude"]
-        ) # Mengambil data perkiraan cuaca
-    
+def get_data(weather_data):
     data = { # Mengekstrak data perkiraan cuaca dan ditampung di dalam dict
         "date" : weather_data["current"]["time"][:10], # Tanggal pemantauan cuaca (YYYY-MM-DD)
         "time" : weather_data["current"]["time"][11:], # Jam pemantauan cuaca
@@ -66,14 +61,9 @@ def get_data():
 
     return data # Mengembalikan data perkiraan cuaca
 
-def get_weather():
+def get_weather(weather_data):
     with open ('weather_code.json','r') as file: # Membaca file weather_code.json
         weather_code = json.load(file) # Memasukkan isi json ke variabel
-    
-    weather_data = get_location(
-            city_info["latitude"],
-            city_info["longitude"]
-        ) # Mengambil data perkiraan cuaca
 
     data = weather_data["current"]["weather_code"]
 
@@ -96,13 +86,16 @@ while True: # Looping utama: berjalan sampai user memilih 'quit'
         break
 
     city_info = find_city(city) # Mencari data kota berdasarkan input
-    city_data = get_data() # Mengambil data perkiraan cuaca 
-    weather = get_weather()
+    weather_data = get_location(
+            city_info["latitude"],
+            city_info["longitude"]
+        ) # Mengambil data perkiraan cuaca
+    city_data = get_data(weather_data) # Mengambil data perkiraan cuaca 
+    weather = get_weather(weather_data)
 
-    print(f"{city_info["name"]}, {city_info["country"]}\n") # Menampilkan nama kota dan negara
+    print(f"{city_info["name"]}, {city_info["country"]} {city_data["date"]} {city_data["time"]}\n") # Menampilkan nama kota dan negara
 
     # Menampilkan detail informasi cuaca secara terformat
-    print(f"- Waktu pantau    : {city_data["date"]} {city_data["time"]}")
     print(f"- Kondisi cuaca   : {weather}")
     print(f"- Suhu            : {city_data["temperature"]} °C")
     print(f"- Kecepatan angin : {city_data["wind_speed"]} km/h")
