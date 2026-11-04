@@ -18,7 +18,6 @@ title = """
 
 def find_city(city):
     print(f"Mencari data untuk kota '{city}'....\n")
-    time.sleep(0.5)
 
     city_response = requests.get(
         f"https://geocoding-api.open-meteo.com/v1/search?name={city}" # Mengirim request ke API dengan nama kota sebagai query 
@@ -28,7 +27,7 @@ def find_city(city):
     
     city_data = city_response.json() # Mengubah format data menjadi dict python
 
-    data = { # Mengekstrak data kota dan ditampung di dalam dict 
+    data = { # Mengekstrak data kota
         "name"      : city_data['results'][0]['name'],      # Nama kota
         "country"   : city_data['results'][0]['country'],   # Negara
         "latitude"  : city_data['results'][0]['latitude'],  # Koordinat garis lintang
@@ -42,7 +41,6 @@ def find_city(city):
 # "Function untuk mencari data perkiraan cuaca"
 def get_location(latitude, longitude):
     print("Mengambil data cuaca terbaru...\n")
-    time.sleep(0.5)
 
     api_response = requests.get(
         f"https://api.open-meteo.com/v1/forecast?"
@@ -57,7 +55,7 @@ def get_data():
     weather_data = get_location(
             city_info["latitude"],
             city_info["longitude"]
-        ) # Mengambil nilai lintang bujur kota dengan function get_location
+        ) # Mengambil data perkiraan cuaca
     
     data = { # Mengekstrak data perkiraan cuaca dan ditampung di dalam dict
         "date" : weather_data["current"]["time"][:10], # Tanggal pemantauan cuaca (YYYY-MM-DD)
@@ -68,6 +66,19 @@ def get_data():
 
     return data # Mengembalikan data perkiraan cuaca
 
+def get_weather():
+    with open ('weather_code.json','r') as file: # Membaca file weather_code.json
+        weather_code = json.load(file) # Memasukkan isi json ke variabel
+    
+    weather_data = get_location(
+            city_info["latitude"],
+            city_info["longitude"]
+        ) # Mengambil data perkiraan cuaca
+
+    data = weather_data["current"]["weather_code"]
+
+    return weather_code[f"{data}"]
+
 # "PROGRAM UTAMA"
 session = 0 # Melacak jumlah pencarian yang sudah dilakukan
 
@@ -77,22 +88,23 @@ while True: # Looping utama: berjalan sampai user memilih 'quit'
     quit_massage = ""
 
     if session > 0: # Tampilkan opsi keluar hanya jika user sudah pernah melakukan pencarian
-        quit_massage = "(Ketik 'quit' untuk berhenti)"
+        quit_massage = "('q' untuk berhenti)"
 
     city = input(f"\nMasukkan nama kota{quit_massage}: ") # Input nama kota
 
-    if city == "quit": # Menghentikan loop saat user memilih quit
+    if city == "q": # quit
         break
 
     city_info = find_city(city) # Mencari data kota berdasarkan input
-    city_weather = get_data() # Mengambil data perkiraan cuaca 
+    city_data = get_data() # Mengambil data perkiraan cuaca 
+    weather = get_weather()
 
     print(f"{city_info["name"]}, {city_info["country"]}\n") # Menampilkan nama kota dan negara
 
     # Menampilkan detail informasi cuaca secara terformat
-    print(f"- Waktu pantau    : {city_weather["date"]} {city_weather["time"]}")
-    print(f"- Kondisi cuaca   : {city_weather["weather"]}")
-    print(f"- Suhu            : {city_weather["temperature"]} °C")
-    print(f"- Kecepatan angin : {city_weather["wind_speed"]} km/h")
+    print(f"- Waktu pantau    : {city_data["date"]} {city_data["time"]}")
+    print(f"- Kondisi cuaca   : {weather}")
+    print(f"- Suhu            : {city_data["temperature"]} °C")
+    print(f"- Kecepatan angin : {city_data["wind_speed"]} km/h")
 
     session += 1 # Menambahkan jumlah sesi
