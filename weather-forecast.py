@@ -69,35 +69,38 @@ def get_weather(weather_data):
 
     return weather_code[f"{data}"]
 
-# "PROGRAM UTAMA"
-session = 0 # Melacak jumlah pencarian yang sudah dilakukan
+def main():
+    # "PROGRAM UTAMA"
+    session = 0 # Melacak jumlah pencarian yang sudah dilakukan
 
-print(title) # Menampilkan judul program
+    print(title) # Menampilkan judul program
 
-while True: # Looping utama: berjalan sampai user memilih 'quit'
-    quit_massage = ""
+    while True: # Looping utama: berjalan sampai user memilih 'quit'
+        quit_massage = ""
 
-    if session > 0: # Tampilkan opsi keluar hanya jika user sudah pernah melakukan pencarian
-        quit_massage = "('q' untuk berhenti)"
+        if session > 0: # Tampilkan opsi keluar hanya jika user sudah pernah melakukan pencarian
+            quit_massage = "('q' untuk berhenti)"
 
-    city = input(f"\nMasukkan nama kota{quit_massage}: ") # Input nama kota
+        city = input(f"\nMasukkan nama kota{quit_massage}: ") # Input nama kota
 
-    if city == "q": # quit
-        break
+        if city == "q": # quit
+            break
 
-    city_info = find_city(city) # Mencari data kota berdasarkan input
-    weather_data = get_location(
-            city_info["latitude"],
-            city_info["longitude"]
-        ) # Mengambil data perkiraan cuaca
-    city_data = get_data(weather_data) # Mengambil data perkiraan cuaca 
-    weather = get_weather(weather_data)
+        city_info = find_city(city) # Mencari data kota berdasarkan input
+        weather_data = get_location(
+                city_info["latitude"],
+                city_info["longitude"]
+            ) # Mengambil data perkiraan cuaca
+        city_data = get_data(weather_data) # Mengambil data perkiraan cuaca 
+        weather = get_weather(weather_data)
 
-    print(f"{city_info["name"]}, {city_info["country"]} {city_data["date"]} {city_data["time"]}\n") # Menampilkan nama kota dan negara
+        print(f"{city_info["name"]}, {city_info["country"]} {city_data["date"]} {city_data["time"]}\n") # Menampilkan nama kota dan negara
 
-    # Menampilkan detail informasi cuaca secara terformat
-    print(f"- Kondisi cuaca   : {weather}")
-    print(f"- Suhu            : {city_data["temperature"]} °C")
-    print(f"- Kecepatan angin : {city_data["wind_speed"]} km/h")
+        # Menampilkan detail informasi cuaca secara terformat
+        print(f"- Kondisi cuaca   : {weather}")
+        print(f"- Suhu            : {city_data["temperature"]} °C")
+        print(f"- Kecepatan angin : {city_data["wind_speed"]} km/h")
 
-    session += 1 # Menambahkan jumlah sesi
+        session += 1 # Menambahkan jumlah sesi
+
+main()
