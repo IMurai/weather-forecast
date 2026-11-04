@@ -1,5 +1,6 @@
 import requests
 import time
+import json
 
 # =================================================Z
 # ASCII Art untuk title
@@ -43,13 +44,13 @@ def get_forecast(latitude, longitude):
     print("Mengambil data cuaca terbaru...\n")
     time.sleep(0.5)
 
-    weather_response = requests.get(
+    api_response = requests.get(
         f"https://api.open-meteo.com/v1/forecast?"
         f"latitude={latitude}&longitude={longitude}"
         f"&current=temperature_2m,weather_code,wind_speed_10m"
         ) # Mengambil dan menyimpan data perkiraan cuaca dari API
 
-    return weather_response.json() # Mengembalikan data response(data mentah) dalam bentuk dict
+    return api_response.json() # Mengembalikan data response(data mentah) dalam bentuk dict
 
 # Function untuk mengambil data perkiraan cuaca
 def get_weather_data():
